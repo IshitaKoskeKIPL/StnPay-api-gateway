@@ -9,6 +9,8 @@ export class UserService {
   constructor(
     @Inject('AUTH_MICROSERVICE')
     private readonly authMicroservice: ClientProxy,
+    @Inject('USER_MICROSERVICE')
+    private readonly userMicroservice: ClientProxy,
   ) {
     this.logger = new Logger(); // to create new log file
   }
@@ -20,5 +22,41 @@ export class UserService {
       console.log(err);
     });
     return res;
+  }
+
+  async getUser(userId: string): Promise<ResponseDTO> {
+    return firstValueFrom(
+      this.userMicroservice.send(
+        { role: 'user', cmd: 'get_user' },
+        { userId },
+      ),
+    );
+  }
+
+  async updateUser(userId: string, userData: any): Promise<ResponseDTO> {
+    return firstValueFrom(
+      this.userMicroservice.send(
+        { role: 'user', cmd: 'update_user' },
+        { userId, ...userData },
+      ),
+    );
+  }
+
+  async deleteUser(userId: string): Promise<ResponseDTO> {
+    return firstValueFrom(
+      this.userMicroservice.send(
+        { role: 'user', cmd: 'delete_user' },
+        { userId },
+      ),
+    );
+  }
+
+  async listUsers(filters: any = {}): Promise<ResponseDTO> {
+    return firstValueFrom(
+      this.userMicroservice.send(
+        { role: 'user', cmd: 'list_users' },
+        filters,
+      ),
+    );
   }
 }
